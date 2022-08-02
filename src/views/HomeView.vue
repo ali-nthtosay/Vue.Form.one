@@ -1,18 +1,47 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <Home />
+  <div v-if="projects.length">
+    <div v-for="item in projects" :key="item.id">
+      <SingleProductPage :prop="item" @deleteFromHomeProject="handleDelete" @completeChanger="handleComplete"  />
+    </div>
+
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import SingleProductPage from '../components/SinglePrPage.vue'
+
 
 export default {
-  name: 'HomeView',
-  components: {
-    HelloWorld
+  components: { SingleProductPage  },
+  data() {
+    return {
+      projects: []
+    }
+  },
+  mounted() {
+    fetch('http://localhost:3000/jsonproject')
+      .then(res => res.json())
+      .then(data => this.projects = data)
+      .catch(err => console.log(err.message))
+  },
+  methods:{
+    handleDelete(removeId){
+    this.projects = this.projects.filter(i => {
+      return i.id !== removeId
+    })
+    },
+    handleComplete(CompId){
+      let p = this.projects.find(item => {
+        return item.id === CompId
+      })
+      p.complete = !p.complete
+    }
   }
+  
 }
 </script>
+
+<style>
+
+</style>
